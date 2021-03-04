@@ -43,10 +43,10 @@ def chromosomes = Channel.fromPath(params.genome.replace('fasta', 'dict'))
     .map{type, chr, chr_len, md5, file -> [chr.minus('SN:')]}
 
 // Define ped file, used in Kinship
-def ped_file = file("${params.ped_folder}/${analysis_id}.ped")
-if (!ped_file.exists()) {
-    exit 1, "ERROR: ${ped_file} not found."
-}
+// def ped_file = file("${params.ped_folder}/${analysis_id}.ped")
+//if (!ped_file.exists()) {
+//    exit 1, "ERROR: ${ped_file} not found."
+//}
 
 workflow {
     // Mapping
@@ -74,14 +74,14 @@ workflow {
     GATK_UnifiedGenotyper(Sambamba_Merge.out)
 
     // ExonCov
-    ExonCov(Sambamba_Merge.out.map{sample_id, bam_file, bai_file -> [analysis_id, sample_id, bam_file, bai_file]})
+    // ExonCov(Sambamba_Merge.out.map{sample_id, bam_file, bai_file -> [analysis_id, sample_id, bam_file, bai_file]})
 
     // ExomeDepth
     ExomeDepth(Sambamba_Merge.out.map{sample_id, bam_file, bai_file -> [analysis_id, sample_id, bam_file, bai_file]})
     ExomeDepthSummary(analysis_id, ExomeDepth.out.HC_stats_log.collect())
 
     // Kinship
-    Kinship(GATK_CombineVariants.out)
+    // Kinship(GATK_CombineVariants.out)
 
     // QC
     FastQC(fastq_files)
@@ -113,7 +113,7 @@ workflow {
     )
 
     //SavePedFile
-    SavePedFile()
+    //SavePedFile()
 
     // Repository versions
     VersionLog()
